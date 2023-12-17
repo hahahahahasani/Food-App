@@ -1,6 +1,11 @@
 // ignore_for_file: use_full_hex_values_for_flutter_colors, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
+import 'package:food/app/data/model_makanan.dart';
+import 'package:food/app/screen/detail_makanan.dart';
+import 'package:food/app/screen/profile.dart';
+import 'package:food/app/view%20model/fetch_makanan.dart';
+import 'package:get/get.dart';
 // import 'package:food/app/screen/detail_makanan.dart';
 // import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,7 +16,7 @@ var category = ["All", "Breakfas", "Lunch", "Dinner"];
 var selectedCategory = 0;
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  // const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -19,10 +24,46 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // List<Makanan> detailMakanan = [];
+  Repository repo = Repository();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.greenAccent,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+        onTap: (int index) {
+          switch (index) {
+            case 0:
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomeScreen(),
+                ),
+              );
+              break;
+            case 1:
+              // Navigasi ke halaman ProfilePage
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Profile(),
+                ),
+              );
+              break;
+          }
+        },
+        currentIndex: 0,
+      ),
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xfffF0F6F4),
       body: SingleChildScrollView(
@@ -50,7 +91,207 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(
               height: 16,
             ),
-            quickEasy()
+            Align(
+              alignment: AlignmentDirectional.topStart,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Quick & Easy',
+                          style: GoogleFonts.manrope(
+                              fontSize: 24, fontWeight: FontWeight.w800),
+                        ),
+                        TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              'View All',
+                              style: GoogleFonts.manrope(
+                                  height: 150 / 100,
+                                  fontSize: 14,
+                                  color: const Color(0xfff8ED259),
+                                  fontWeight: FontWeight.w600),
+                            ))
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  FutureBuilder<List<dynamic>>(
+                      future: repo.fetchDataMakanan(),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData) {
+                          return SizedBox(
+                            height: 250,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: snapshot.data.length,
+                                itemBuilder: (context, int index) {
+                                  var food = snapshot.data[index];
+                                  return InkWell(
+                                    child: Container(
+                                      margin: EdgeInsets.only(left: 20),
+                                      width: 220,
+                                      height: 240,
+                                      child: FutureBuilder<List<dynamic>>(
+                                          future: repo.fetchDataMakanan(),
+                                          builder: (context,
+                                              AsyncSnapshot snapshot) {
+                                            if (snapshot.hasData) {
+                                              return Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    width: 220,
+                                                    height: 140,
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(24),
+                                                        image: DecorationImage(
+                                                            fit: BoxFit.cover,
+                                                            image: NetworkImage(
+                                                                food.gambar))),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 4,
+                                                  ),
+                                                  Text(
+                                                    food.judul,
+                                                    style: GoogleFonts.manrope(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 4,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        FeatherIcons.pieChart,
+                                                        size: 12,
+                                                        color:
+                                                            Color(0xffB3B3B3),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 4,
+                                                      ),
+                                                      Text(
+                                                        food.kalori,
+                                                        style:
+                                                            GoogleFonts.manrope(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          color: const Color(
+                                                              0xffB3B3B3),
+                                                          height: 130 / 100,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 8,
+                                                      ),
+                                                      const Icon(
+                                                        FeatherIcons.clock,
+                                                        size: 12,
+                                                        color:
+                                                            Color(0xffB3B3B3),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 4,
+                                                      ),
+                                                      Text(
+                                                        food.waktu,
+                                                        style:
+                                                            GoogleFonts.manrope(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          color: const Color(
+                                                              0xffB3B3B3),
+                                                          height: 130 / 100,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 4,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.star,
+                                                        size: 16,
+                                                        color:
+                                                            Color(0xffE8D213),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 4,
+                                                      ),
+                                                      Text(
+                                                        food.bintang,
+                                                        style:
+                                                            GoogleFonts.manrope(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          color: Colors.black,
+                                                          height: 140 / 100,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 4,
+                                                      ),
+                                                      Text(
+                                                        food.review,
+                                                        style:
+                                                            GoogleFonts.manrope(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          color: const Color(
+                                                              0xffB3B3B3),
+                                                          height: 140 / 100,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              );
+                                            } else {
+                                              return const Center(
+                                                  child:
+                                                      CircularProgressIndicator());
+                                            }
+                                          }),
+                                    ),
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context){
+                                            return DetailMakanan(food: food);
+                                          }
+                                        )
+                                      );
+                                    },
+                                  );
+                                }),
+                          );
+                        } else {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                      })
+                ],
+              ),
+            )
           ],
         )),
       ),
@@ -207,157 +448,6 @@ Widget categories() => Align(
                       width: 10,
                     ),
                 itemCount: category.length),
-          )
-        ],
-      ),
-    );
-
-Widget quickEasy() => Align(
-      alignment: AlignmentDirectional.topStart,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Quick & Easy',
-                  style: GoogleFonts.manrope(
-                      fontSize: 24, fontWeight: FontWeight.w800),
-                ),
-                TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'View All',
-                      style: GoogleFonts.manrope(
-                          height: 150 / 100,
-                          fontSize: 14,
-                          color: const Color(0xfff8ED259),
-                          fontWeight: FontWeight.w600),
-                    ))
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          SizedBox(
-            height: 250,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: detailMakanan.map((food) {
-                return Container(
-                  margin: EdgeInsets.only(left: 20),
-                  width: 220,
-                  height: 240,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 220,
-                        height: 140,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(24),
-                            image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: NetworkImage(food.gambar))),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Text(
-                        food.judul,
-                        style: GoogleFonts.manrope(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Row(
-                        children: [
-                          const Icon(
-                            FeatherIcons.pieChart,
-                            size: 12,
-                            color: Color(0xffB3B3B3),
-                          ),
-                          const SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            food.kalori,
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xffB3B3B3),
-                              height: 130 / 100,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          const Icon(
-                            FeatherIcons.clock,
-                            size: 12,
-                            color: Color(0xffB3B3B3),
-                          ),
-                          const SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            food.waktu,
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xffB3B3B3),
-                              height: 130 / 100,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            size: 16,
-                            color: Color(0xffE8D213),
-                          ),
-                          const SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            food.bintang,
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.black,
-                              height: 140 / 100,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            food.review,
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xffB3B3B3),
-                              height: 140 / 100,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
           )
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:food/app/screen/home.dart';
+import 'package:food/app/screen/profile.dart';
 import 'app/screen/splash.dart';
 import 'app/screen/detail_makanan.dart';
 import 'app/screen/quick_easy.dart';
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: DetailMakanan(),
+      home: SplashScreen(),
     );
   }
 }
